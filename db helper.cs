@@ -15,8 +15,11 @@ namespace visa.vfsglobal.com
 
         static public void resetdb()
         {
-            MessageBox.Show("دیتابیس مجدد راه اندازی میشود");
-            runQuery(@"DROP TABLE [users];
+
+            DialogResult result = MessageBox.Show("خطای غیر منتظره در مدیریت دیتا بیس رخ داد \n  ایا میخواهید دیتا بیس به حالت پیش فرض بازنشانی کنید؟ ", "راه اندازی خودکار", MessageBoxButtons.YesNo,MessageBoxIcon.Warning,MessageBoxDefaultButton.Button1,MessageBoxOptions.RightAlign);
+            if (result == DialogResult.Yes)
+            {
+                runQuery(@"DROP TABLE IF EXISTS users;
                     CREATE TABLE [users] (
                     [Id] bigint NOT NULL
                     , [username] text NOT NULL
@@ -28,6 +31,7 @@ namespace visa.vfsglobal.com
                     , [phone] text NULL
                     , CONSTRAINT [sqlite_master_PK_users] PRIMARY KEY ([Id])
                     );", conctionStringDataBase1);
+            }
         }
         static public int getLastIdFromUser()
         {
