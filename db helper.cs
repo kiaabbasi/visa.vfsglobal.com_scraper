@@ -12,14 +12,22 @@ namespace visa.vfsglobal.com
         static public string conctionStringDataBase1 = $"data source={Application.StartupPath}\\Database\\userdb.db";
         //static public string conctionStringDataBase1 = @"Flags=Default;Base Schema Name=DataBase;data source=C:\Users\HRT\source\repos\WindowsFormsApp1\bot2\Database\database.db";
 
-        
+
         static public void resetdb()
         {
             MessageBox.Show("دیتابیس مجدد راه اندازی میشود");
-            runQuery("DROP TABLE IF EXISTS [banks];\r\nCREATE TABLE [banks] (\r\n  [Id] bigint NOT NULL\r\n, [name] text NOT NULL\r\n, [branchName] text NOT NULL\r\n, [onUserId] text NOT NULL\r\n, CONSTRAINT [sqlite_autoindex_banks_1] PRIMARY KEY ([Id])\r\n);", conctionStringDataBase1);
-            runQuery("DROP TABLE IF EXISTS [setting];\r\nCREATE TABLE [setting] (\r\n  [Id] bigint NOT NULL\r\n, [playSoundPage1] bigint DEFAULT (0) NOT NULL\r\n, [playSoundPage2] bigint DEFAULT (0) NOT NULL\r\n, [playSoundPage3] bigint DEFAULT (0) NOT NULL\r\n, [autoSmsFiller] bigint DEFAULT (0) NOT NULL\r\n, [tryNoResursCount] bigint DEFAULT (0) NOT NULL\r\n, [refreshCaptchaPerMinnet] bigint DEFAULT (0) NOT NULL\r\n, [refreshFromPerMinnet] bigint DEFAULT (0) NOT NULL\r\n, [checkBankPerSeccend] bigint DEFAULT (0) NOT NULL\r\n, [autoStartNextUser] bigint DEFAULT (0) NOT NULL\r\n, [autoBooking] bigint DEFAULT (0) NULL\r\n, [delayForTryInPage1] bigint NULL\r\n, [autoCaptchaSlover] bigint DEFAULT (1) NOT NULL\r\n, [backToPage1] bigint DEFAULT (0) NULL\r\n, CONSTRAINT [sqlite_autoindex_setting_1] PRIMARY KEY ([Id])\r\n);\r\n", conctionStringDataBase1);
-            runQuery("DROP TABLE IF EXISTS [users];\r\nCREATE TABLE [users] (\r\n  [Id] bigint NOT NULL\r\n, [codeMelly] text NOT NULL\r\n, [codeMellyPhoneNumberOwner] text NULL\r\n, [province] text NULL\r\n, [city] text NULL\r\n, [bornDay] text NULL\r\n, [bornMon] text NULL\r\n, [bornYer] text NULL\r\n, [name] text NULL\r\n, [familyName] text NULL\r\n, [fatherName] text NULL\r\n, [staticPhoneNumber] text NULL\r\n, [phoneNumber] text NULL\r\n, [codeMellyHamsar] text NULL\r\n, [postalCode] text NULL\r\n, [address] text NULL\r\n, [sacrificeState] bigint NULL\r\n, [armyState] bigint NULL\r\n, [citizenshipStatus] bigint NULL\r\n, [status] text DEFAULT (5) NULL\r\n, [maryDay] text NULL\r\n, [maryMon] text NULL\r\n, [maryYer] text NULL\r\n, [rayCode] text NULL\r\n, [gender] text NULL\r\n, [email] text NULL\r\n, [banksState] bigint DEFAULT (0) NULL\r\n, [smsForwarderConnection] text NULL\r\n, [smsCount] bigint DEFAULT (0) NULL\r\n, CONSTRAINT [sqlite_autoindex_users_1] PRIMARY KEY ([Id])\r\n);\r\n", conctionStringDataBase1);
-            runQuery("INSERT INTO  [setting] ([Id],[playSoundPage1],[playSoundPage2],[playSoundPage3],[autoSmsFiller],[tryNoResursCount],[refreshCaptchaPerMinnet],[refreshFromPerMinnet],[checkBankPerSeccend],[autoStartNextUser],[autoBooking],[delayForTryInPage1],[autoCaptchaSlover],[backToPage1]) VALUES (\r\n1,0,0,0,0,10,0,650,5,0,0,3,1,0);\r\n", conctionStringDataBase1);
+            runQuery(@"DROP TABLE [users];
+                    CREATE TABLE [users] (
+                    [Id] bigint NOT NULL
+                    , [username] text NOT NULL
+                    , [password] text NOT NULL
+                    , [proxy] text NOT NULL
+                    , [combobox1] text NOT NULL
+                    , [combobox2] text NOT NULL
+                    , [combobox3] text NOT NULL
+                    , [phone] text NULL
+                    , CONSTRAINT [sqlite_master_PK_users] PRIMARY KEY ([Id])
+                    );", conctionStringDataBase1);
         }
         static public int getLastIdFromUser()
         {
