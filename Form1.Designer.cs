@@ -829,8 +829,10 @@
             // 
             // panelBrowser
             // 
+            this.panelBrowser.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelBrowser.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.panelBrowser.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelBrowser.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panelBrowser.Location = new System.Drawing.Point(0, 0);
             this.panelBrowser.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);

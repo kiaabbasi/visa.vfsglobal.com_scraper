@@ -32,10 +32,30 @@ namespace visa.vfsglobal.com
             
             
         }
+        
+        public async Task<bool> isExistElementByXPATH(string xpath)
+        {
+            string script = @$"
+            (function() {{
+                {{
+                    var xpath = '{xpath}';
+                    var element = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                    return  element !== null && element !== undefined;
+
+                }}
+            }})()
+        ";
+
+            JavascriptResponse response = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(script);
+
+            
+            return (bool)response.Result;
+           
+        }
         public async Task<bool> SelectFromSelectBox(string querySelector,string text)
         {
             var clickpnt =await getPointOfElemntStartFromTopLeft(querySelector);
-            int x = (int)clickpnt.Left + 50;
+            int x = (int)clickpnt.Left + 30;
             int y = (int)clickpnt.Top + 20;
             if (isCanseling)
             {
@@ -45,6 +65,7 @@ namespace visa.vfsglobal.com
             chromiumWebBrowser.GetBrowser().GetHost().SendMouseClickEvent(x, y, MouseButtonType.Left, false, 1, CefEventFlags.None);
             await Task.Delay(100);  // Use Thread.Sleep to ensure it's caught by ThreadAbortException
             chromiumWebBrowser.GetBrowser().GetHost().SendMouseClickEvent(x, y, MouseButtonType.Left, true, 1, CefEventFlags.None);
+            await Task.Delay(200);
 
             string scriptToClick = @$"function findAndClick() {{
             // Find all elements with the class 'mat-option-text'
@@ -86,7 +107,7 @@ namespace visa.vfsglobal.com
                 await Task.Delay(1000);
             }
         }
-        public async Task<bool> elmentExistwithClassName(string nm)
+        private async Task<bool> elmentExistwithClassName(string nm)
         {
             string script = @$"
         (function() {{
@@ -96,7 +117,13 @@ namespace visa.vfsglobal.com
         if (isCanseling)
             return false;
 
-        JavascriptResponse response = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(script);
+        string notif = await getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div/html/body/app-root/div/header/app-notification/div");
+        if (!string.IsNullOrWhiteSpace(notif))
+        {
+            return false;// its disable it
+        }
+
+            JavascriptResponse response = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(script);
 
         if (response.Success && response.Result is bool result)
         {
@@ -119,6 +146,7 @@ namespace visa.vfsglobal.com
 
             if (isCanseling)
                 return false;
+
             
             JavascriptResponse response = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(script);
 
@@ -144,7 +172,7 @@ namespace visa.vfsglobal.com
         }
         public async void DrawCircle(int x, int y)
         {
-            return;
+            
             string script = $@"
                 (function() {{
                     var canvas = document.createElement('canvas');
@@ -205,7 +233,7 @@ namespace visa.vfsglobal.com
             return !(bool)response.Result;
         }
 
-        public async Task sendKeysByXpath(string xpath, string value,bool cleanBefore=true)
+        public async Task sendKeysByXpath(string xpath, string value,bool cleanBefore=true,int randomXRange=20,int randomYRange=10)
         {
 
             // JavaScript to find the element by XPath and click it
@@ -222,29 +250,36 @@ namespace visa.vfsglobal.com
     ";
 
             // Execute the JavaScript on the main frame and get the result
+            if (cleanBefore)
+            {
+                await Task.Delay(800);
+            }
+            await Task.Delay(200);
             var response = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(script);
-
+            
             if (response.Success && response.Result != null)
             {
                 if (isCanseling)
                     return;
+                Random random = new Random();
                 dynamic result = response.Result;
-                int x=(int)result.x;
-                int y=(int)result.y;
+                int x=(int)result.x + random.Next(randomXRange);
+                int y=(int)result.y+ random.Next(randomYRange);
+                DrawCircle(x, y);
                 chromiumWebBrowser.GetBrowser().GetHost().SendMouseClickEvent(x,y, MouseButtonType.Left, true, 1, CefEventFlags.None);
-                await Task.Delay(60);
+                await Task.Delay(random.Next(10,100));
                 chromiumWebBrowser.GetBrowser().GetHost().SendMouseClickEvent(x, y, MouseButtonType.Left, false, 1, CefEventFlags.None);
                 if (cleanBefore)
                 {
-                    await setValueBuyXpath(xpath, "");
-                    /*await Task.Delay(60);
+                    //await setValueBuyXpath(xpath, "");
+                    await Task.Delay(random.Next(30, 100));
                     chromiumWebBrowser.GetBrowser().GetHost().SendKeyEvent(new KeyEvent { WindowsKeyCode = (int)Keys.A, Modifiers = CefEventFlags.ControlDown, Type = KeyEventType.RawKeyDown });
-                    await Task.Delay(20);
+                    await Task.Delay(random.Next(10, 70));
                     chromiumWebBrowser.GetBrowser().GetHost().SendKeyEvent(new KeyEvent { WindowsKeyCode = (int)Keys.A, Modifiers = CefEventFlags.ControlDown, Type = KeyEventType.KeyUp });
-                    await Task.Delay(20);
+                    await Task.Delay(random.Next(10, 70));
                     chromiumWebBrowser.GetBrowser().GetHost().SendKeyEvent(new KeyEvent { WindowsKeyCode = (int)Keys.Delete, Type = KeyEventType.RawKeyDown });
-                    await Task.Delay(10);
-                    chromiumWebBrowser.GetBrowser().GetHost().SendKeyEvent(new KeyEvent { WindowsKeyCode = (int)Keys.Delete, Type = KeyEventType.KeyUp });*/
+                    await Task.Delay(random.Next(10, 60));
+                    chromiumWebBrowser.GetBrowser().GetHost().SendKeyEvent(new KeyEvent { WindowsKeyCode = (int)Keys.Delete, Type = KeyEventType.KeyUp });
 
                 }
                 foreach (char c in value)
@@ -252,7 +287,7 @@ namespace visa.vfsglobal.com
                     if (isCanseling)
                         return;
                     chromiumWebBrowser.GetBrowser().GetHost().SendKeyEvent(new KeyEvent { WindowsKeyCode = (int)c, Type = KeyEventType.Char });
-                    await Task.Delay(40);
+                    await Task.Delay(random.Next(10, 90));
                 }
                 
 

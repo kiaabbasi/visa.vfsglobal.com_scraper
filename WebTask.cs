@@ -112,6 +112,7 @@ namespace visa.vfsglobal.com
                 }
                 await Task.Delay(1000);
             }
+
             await webHandelers.sendKeysByXpath("//*[@id=\"mat-input-5\"]", smsCode);
             var result = await webHandelers.getPointOfElemntStartFromTopLeft("body > app-root > div > div > app-login > section > div > div > mat-card > form > app-cloudflare-captcha-container");
             //MessageBox.Show($"{result.Top},{result.Left}");
@@ -157,14 +158,14 @@ namespace visa.vfsglobal.com
                 if (webHandelers.isCanseling)
                     return;
                 await webHandelers.SelectFromSelectBox("#mat-select-value-1", selectBox1);
-                await webHandelers.waitPageReady();
                 await Task.Delay(1000);
+                await webHandelers.waitPageReady();
                 await webHandelers.SelectFromSelectBox("#mat-select-value-5", selectBox2);
-                await webHandelers.waitPageReady();
                 await Task.Delay(1000);
+                await webHandelers.waitPageReady();
                 await webHandelers.SelectFromSelectBox("#mat-select-value-3", selectBox3);
-                await webHandelers.waitPageReady();
                 await Task.Delay(1000);
+                await webHandelers.waitPageReady();
             }
             catch (Exception e)
             {

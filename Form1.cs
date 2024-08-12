@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace visa.vfsglobal.com
@@ -55,17 +56,25 @@ namespace visa.vfsglobal.com
         {
             webHandelers.RemoveCircle();
         }
-        private async Task forcSmsNotEmpty()
+        private async Task<int> forcSmsNotEmpty()
         {
-            while (txtSmsCode.Tag.ToString()==false.ToString())
-            {
+            while (txtSmsCode.Tag.ToString()==false.ToString()){
                 if (webHandelers.isCanseling)
                 {
-                    return;
+                    return -1;
                 }
-
+                else if ((await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-dashboard/section[1]/div/div[1]/div[2]/button/span[1]")).Contains("Start New Booking"))
+                {
+                    return 2;
+                }
+                else if (await webHandelers.isExistElementByXPATH("/html/body/app-root/div/header/app-notification/div"))
+                {
+                    throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div"));
+                }
+                await Task.Delay (1000);
             }
             Invoke(new Action(() => lblStatus.Text = "کد دریافت شد"));
+            return 0;
         }
         private async Task fillSmsUseingApi()
         {
@@ -82,6 +91,7 @@ namespace visa.vfsglobal.com
                 {
                     txtSmsCode.Text = code;
                     btnSubmitSms.PerformClick();
+                    return;
                 }
                
             }
@@ -134,11 +144,14 @@ namespace visa.vfsglobal.com
         private System.Windows.Forms.Timer timer; // Declare a timer
         private TimeSpan elapsedTime; // To track elapsed time
 
+        bool startLock = false;
         private async Task start ()
         {
-            
+            Task autoSmsFilerTask = Task.CompletedTask;
+            bool erorGeneraterd=false;
             try
             {
+                startLock = true;
                 Invoke(new Action(() => lblStatus.Text = "درحال اجرا"));
                 
                 while (true)
@@ -150,9 +163,17 @@ namespace visa.vfsglobal.com
                     }
                     await WebTask.page1(webHandelers, txtUsername.Text, txtPassword.Text);
                     Invoke(new Action(() => lblStatus.Text = "در انتظار کد"));
-                    fillSmsUseingApi();
-                    await forcSmsNotEmpty();
-                    await WebTask.page2(webHandelers, txtSmsCode.Text);
+                    autoSmsFilerTask =fillSmsUseingApi();
+                    int resulrt =await forcSmsNotEmpty();
+                    if (resulrt == 0)
+                    {
+                        while (!await WebTask.page2(webHandelers, txtSmsCode.Text))
+                        {
+                            Invoke(new Action(() => lblStatus.Text = "خطا در کلادفلر تلاش مجدد در 10 ثاتیه"));
+                            await customDeley(10);
+                        }
+                        
+                    }
                     await Task.Delay(1000);
                     await WebTask.page3_4(webHandelers, GetComboBoxApplicationCentreTextSafe(), GetComboBoAppointmentCategoryTextSafe(), GetsiticoneComboBox3TextSafe());
                     int resultLoop=await getResultAsLoop();
@@ -173,14 +194,22 @@ namespace visa.vfsglobal.com
             }
             catch(Exception e)
             {
+                string a = browser.GetSourceAsync().Result;
                 Invoke(new Action(() => lblStatus.Text = e.Message));
+                erorGeneraterd = true;
             }
             finally
             {
-                webHandelers.isCanseling = false;
+                await webHandelers.cansel();
+                await autoSmsFilerTask;
                 txtSmsCode.Tag = false.ToString();
-                Invoke(new Action(() => lblStatus.Text = "در انتظار شروع"));
+                if (!erorGeneraterd)
+                {
+                    Invoke(new Action(() => lblStatus.Text = "در انتظار شروع"));
+                }
                 timer.Stop();
+                webHandelers.isCanseling = false;
+                startLock = false;
             }
         }
 
@@ -191,7 +220,7 @@ namespace visa.vfsglobal.com
         {
             
             
-            if ((mainThread == null || !mainThread.IsAlive))
+            if (! startLock)
             {
                 webHandelers.isCanseling = false;
                 txtSmsCode.Tag = false.ToString();
@@ -203,6 +232,7 @@ namespace visa.vfsglobal.com
                     elapsedTime = TimeSpan.Zero; // Initialize elapsed time
                     timer.Start();
                     mainThread = new Thread(async () => await start());
+                    
                     mainThread.Start();
                 }
             }
@@ -214,10 +244,7 @@ namespace visa.vfsglobal.com
             
             if (!webHandelers.isCanseling || mainThread.IsAlive)
             {
-                mainThread.Abort();
                 webHandelers.cansel().Wait();
-                
-
 
             }
         }
@@ -249,9 +276,12 @@ namespace visa.vfsglobal.com
                 }
                 string[] result = await webHandelers.getResultFromPage4();
                 Invoke(new Action(() => lblStatus.Text = "ارسال دیتا به سرور"));
-                await API.SendResultToServer(result, txtPhoneNumber.Text);
-                Invoke(new Action(() => lblStatus.Text = "ارسال شد"));
-                int deley = rnd.Next(Convert.ToInt32(txtStartNumber.Text),Convert.ToInt32(txtEndNumber.Text));
+                if (await API.SendResultToServer(result, txtPhoneNumber.Text))
+                    Invoke(new Action(() => lblStatus.Text = "ارسال شد"));
+                else
+                    Invoke(new Action(() => lblStatus.Text = "خطا در ارسال اطلاعات"));
+                int deley = rnd.Next(Convert.ToInt32(txtStartNumber.Text), Convert.ToInt32(txtEndNumber.Text));
+                Invoke(new Action(() => lblStatus.Text = $"{deley} ثانیه"));
                 await customDeley(deley);
                 Invoke(new Action(() => lblStatus.Text = "رفرش صفحه"));
                 if ((bool)comboBoxAppointmentCategory.Invoke(new Func<bool>(() => comboBoxAppointmentCategory.SelectedIndex ==0 )))
@@ -264,12 +294,13 @@ namespace visa.vfsglobal.com
                 }
 
                 
-                await webHandelers.waitPageReady();
                 await Task.Delay(1000);
+                await webHandelers.waitPageReady();
                 await webHandelers.SelectFromSelectBox("#mat-select-value-5", GetComboBoAppointmentCategoryTextSafe());
-                await webHandelers.waitPageReady();
                 await Task.Delay(1000);
+                await webHandelers.waitPageReady();
                 await webHandelers.SelectFromSelectBox("#mat-select-value-3", GetsiticoneComboBox3TextSafe());
+                await Task.Delay(1000);
                 await webHandelers.waitPageReady();
                 if (! await webHandelers.canIContnueRefreshing())
                 {
@@ -348,8 +379,11 @@ namespace visa.vfsglobal.com
 
         private void comboBoxUsers_SelectedIndexChanged(object sender, EventArgs e)
         {
-            DataTable dt = dbCommand.runQuery($"SELECT * FROM users WHERE Id={usersOnComboBoxIdis[comboBoxUsers.SelectedIndex]}",dbCommand.conctionStringDataBase1);
-            loadUser(dt.Rows[0]);
+            if (comboBoxUsers.SelectedIndex != -1)
+            {
+                DataTable dt = dbCommand.runQuery($"SELECT * FROM users WHERE Id={usersOnComboBoxIdis[comboBoxUsers.SelectedIndex]}", dbCommand.conctionStringDataBase1);
+                loadUser(dt.Rows[0]);
+            }
         }
         private void loadUser(DataRow userRow)
         {
@@ -373,6 +407,7 @@ namespace visa.vfsglobal.com
             txtPassword.Clear();
             txtProxy.Clear();
             txtPhoneNumber.Clear();
+            comboBoxUsers.SelectedIndex = -1;
 
         }
 
