@@ -30,6 +30,7 @@
         {
             this.panelMain = new System.Windows.Forms.Panel();
             this.panelRight = new System.Windows.Forms.Panel();
+            this.btnRefresh = new Siticone.UI.WinForms.SiticoneGradientCircleButton();
             this.comboBoxUsers = new Siticone.UI.WinForms.SiticoneComboBox();
             this.label20 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
@@ -93,6 +94,7 @@
             // 
             // panelRight
             // 
+            this.panelRight.Controls.Add(this.btnRefresh);
             this.panelRight.Controls.Add(this.comboBoxUsers);
             this.panelRight.Controls.Add(this.label20);
             this.panelRight.Controls.Add(this.label19);
@@ -140,23 +142,43 @@
             this.panelRight.Size = new System.Drawing.Size(388, 971);
             this.panelRight.TabIndex = 6;
             // 
+            // btnRefresh
+            // 
+            this.btnRefresh.CheckedState.Parent = this.btnRefresh;
+            this.btnRefresh.CustomImages.Parent = this.btnRefresh;
+            this.btnRefresh.FillColor = System.Drawing.Color.Transparent;
+            this.btnRefresh.FillColor2 = System.Drawing.Color.Transparent;
+            this.btnRefresh.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnRefresh.ForeColor = System.Drawing.Color.White;
+            this.btnRefresh.HoveredState.Parent = this.btnRefresh;
+            this.btnRefresh.Image = global::visa.vfsglobal.com.Properties.Resources.icons8_refresh_30;
+            this.btnRefresh.ImageSize = new System.Drawing.Size(30, 30);
+            this.btnRefresh.Location = new System.Drawing.Point(4, 149);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.ShadowDecoration.Mode = Siticone.UI.WinForms.Enums.ShadowMode.Circle;
+            this.btnRefresh.ShadowDecoration.Parent = this.btnRefresh;
+            this.btnRefresh.Size = new System.Drawing.Size(30, 30);
+            this.btnRefresh.TabIndex = 18;
+            this.btnRefresh.Tile = false;
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            // 
             // comboBoxUsers
             // 
             this.comboBoxUsers.BackColor = System.Drawing.Color.Transparent;
             this.comboBoxUsers.BorderRadius = 9;
             this.comboBoxUsers.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.comboBoxUsers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxUsers.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxUsers.Font = new System.Drawing.Font("IRANSansWeb", 8F);
             this.comboBoxUsers.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
             this.comboBoxUsers.FormattingEnabled = true;
             this.comboBoxUsers.HoveredState.Parent = this.comboBoxUsers;
             this.comboBoxUsers.ItemHeight = 22;
             this.comboBoxUsers.ItemsAppearance.Parent = this.comboBoxUsers;
-            this.comboBoxUsers.Location = new System.Drawing.Point(228, 149);
+            this.comboBoxUsers.Location = new System.Drawing.Point(203, 149);
             this.comboBoxUsers.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.comboBoxUsers.Name = "comboBoxUsers";
             this.comboBoxUsers.ShadowDecoration.Parent = this.comboBoxUsers;
-            this.comboBoxUsers.Size = new System.Drawing.Size(157, 28);
+            this.comboBoxUsers.Size = new System.Drawing.Size(182, 28);
             this.comboBoxUsers.TabIndex = 17;
             this.comboBoxUsers.SelectedIndexChanged += new System.EventHandler(this.comboBoxUsers_SelectedIndexChanged);
             // 
@@ -339,7 +361,7 @@
             this.btnNewUser.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnNewUser.ForeColor = System.Drawing.Color.White;
             this.btnNewUser.HoveredState.Parent = this.btnNewUser;
-            this.btnNewUser.Location = new System.Drawing.Point(13, 149);
+            this.btnNewUser.Location = new System.Drawing.Point(34, 149);
             this.btnNewUser.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnNewUser.Name = "btnNewUser";
             this.btnNewUser.ShadowDecoration.Parent = this.btnNewUser;
@@ -357,7 +379,7 @@
             this.removeUser.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.removeUser.ForeColor = System.Drawing.Color.White;
             this.removeUser.HoveredState.Parent = this.removeUser;
-            this.removeUser.Location = new System.Drawing.Point(110, 149);
+            this.removeUser.Location = new System.Drawing.Point(88, 149);
             this.removeUser.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.removeUser.Name = "removeUser";
             this.removeUser.ShadowDecoration.Parent = this.removeUser;
@@ -375,7 +397,7 @@
             this.SaveUser.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.SaveUser.ForeColor = System.Drawing.Color.White;
             this.SaveUser.HoveredState.Parent = this.SaveUser;
-            this.SaveUser.Location = new System.Drawing.Point(169, 149);
+            this.SaveUser.Location = new System.Drawing.Point(144, 149);
             this.SaveUser.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.SaveUser.Name = "SaveUser";
             this.SaveUser.ShadowDecoration.Parent = this.SaveUser;
@@ -471,7 +493,7 @@
             this.txtSmsCode.HoveredState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.txtSmsCode.HoveredState.Parent = this.txtSmsCode;
             this.txtSmsCode.Location = new System.Drawing.Point(88, 473);
-            this.txtSmsCode.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
+            this.txtSmsCode.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.txtSmsCode.Name = "txtSmsCode";
             this.txtSmsCode.PasswordChar = '\0';
             this.txtSmsCode.PlaceholderText = "";
@@ -577,7 +599,7 @@
             this.txtProxy.FocusedState.Parent = this.txtProxy;
             this.txtProxy.HoveredState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.txtProxy.HoveredState.Parent = this.txtProxy;
-            this.txtProxy.Location = new System.Drawing.Point(13, 325);
+            this.txtProxy.Location = new System.Drawing.Point(13, 324);
             this.txtProxy.Margin = new System.Windows.Forms.Padding(4, 10, 4, 10);
             this.txtProxy.Name = "txtProxy";
             this.txtProxy.PasswordChar = '\0';
@@ -604,7 +626,7 @@
             this.txtPassword.HoveredState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.txtPassword.HoveredState.Parent = this.txtPassword;
             this.txtPassword.Location = new System.Drawing.Point(13, 279);
-            this.txtPassword.Margin = new System.Windows.Forms.Padding(4, 7, 4, 7);
+            this.txtPassword.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '\0';
             this.txtPassword.PlaceholderText = "";
@@ -908,6 +930,7 @@
         public Siticone.UI.WinForms.SiticoneComboBox comboBoxAppointmentCategory;
         public Siticone.UI.WinForms.SiticoneComboBox comboBoxApplicationCentre;
         private Siticone.UI.WinForms.SiticoneButton btnNewUser;
+        private Siticone.UI.WinForms.SiticoneGradientCircleButton btnRefresh;
     }
 }
 
