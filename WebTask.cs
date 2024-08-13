@@ -16,7 +16,7 @@ namespace visa.vfsglobal.com
         public static async Task page1(WebHandelers webHandelers, string username, string password, bool sendRealKeys = true)
         {
             
-            if (webHandelers.chromiumWebBrowser.Address!= "https://visa.vfsglobal.com/irn/en/dnk/login")
+            if (webHandelers.chromiumWebBrowser.Address!= "https://visa.vfsglobal.com/irn/en/dnk/login" || ! await webHandelers.isElementExist("email"))
             {
                 await webHandelers.chromiumWebBrowser.LoadUrlAsync("https://visa.vfsglobal.com/irn/en/dnk/login");
             }
@@ -113,7 +113,7 @@ namespace visa.vfsglobal.com
                 await Task.Delay(1000);
             }
 
-            await webHandelers.sendKeysByXpath("//*[@id=\"mat-input-5\"]", smsCode);
+            await webHandelers.sendKeysByXpath("//*[@id=\"mat-input-5\"]", smsCode,true,60,10);
             var result = await webHandelers.getPointOfElemntStartFromTopLeft("body > app-root > div > div > app-login > section > div > div > mat-card > form > app-cloudflare-captcha-container");
             //MessageBox.Show($"{result.Top},{result.Left}");
             int x = (int)result.Left + 30;

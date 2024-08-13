@@ -98,6 +98,7 @@ namespace visa.vfsglobal.com
         public async Task waitPageReady()
         {
             await WaitForFrameLoad();
+            
             while (!await isPageReady())
             {
                 if (isCanseling)
@@ -148,7 +149,7 @@ namespace visa.vfsglobal.com
                 return false;
 
             
-            JavascriptResponse response = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(script);
+            JavascriptResponse response = await chromiumWebBrowser.EvaluateScriptAsync(script);
 
             if (response.Success && response.Result is bool result)
             {
@@ -263,8 +264,8 @@ namespace visa.vfsglobal.com
                     return;
                 Random random = new Random();
                 dynamic result = response.Result;
-                int x=(int)result.x + random.Next(randomXRange);
-                int y=(int)result.y+ random.Next(randomYRange);
+                int x=(int)result.x + 5 + random.Next(randomXRange);
+                int y=(int)result.y + 5 + random.Next(randomYRange);
                 DrawCircle(x, y);
                 chromiumWebBrowser.GetBrowser().GetHost().SendMouseClickEvent(x,y, MouseButtonType.Left, true, 1, CefEventFlags.None);
                 await Task.Delay(random.Next(10,100));
