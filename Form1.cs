@@ -34,7 +34,7 @@ namespace visa.vfsglobal.com
             requestHandler = new CustomRequestHandler(null);
 
             // Create a new instance of ChromiumWebBrowser
-            browser = new ChromiumWebBrowser("https://visa.vfsglobal.com/irn/en/dnk/login")//https://visa.vfsglobal.com/irn/en/dnk/login
+            browser = new ChromiumWebBrowser("https://whatismyipaddress.com/")//https://visa.vfsglobal.com/irn/en/dnk/login
             {
                 Dock = DockStyle.Fill,
                 RequestHandler = requestHandler // Set the custom request handler
@@ -67,7 +67,7 @@ namespace visa.vfsglobal.com
                 {
                     return 2;
                 }
-                else if (await webHandelers.isExistElementByXPATH("/html/body/app-root/div/header/app-notification/div"))
+                else if (await webHandelers.isExistElementByXPATH("/html/body/app-root/div/header/app-notification/div") && !string.IsNullOrWhiteSpace(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div")))
                 {
                     throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div"));
                 }
@@ -151,12 +151,21 @@ namespace visa.vfsglobal.com
             bool erorGeneraterd=false;
             try
             {
+                
+
                 startLock = true;
                 Invoke(new Action(() => lblStatus.Text = "درحال اجرا"));
                 
+
+
                 while (true)
                 {
-
+                    if (webHandelers.chromiumWebBrowser.Address != "https://visa.vfsglobal.com/irn/en/dnk/login")
+                    {
+                        await webHandelers.chromiumWebBrowser.LoadUrlAsync("https://visa.vfsglobal.com/irn/en/dnk/login");
+                    }
+                    await webHandelers.waitPageReady();
+                   
                     if (webHandelers.isCanseling)
                     {
                         return;
@@ -223,18 +232,15 @@ namespace visa.vfsglobal.com
             if (! startLock)
             {
                 webHandelers.isCanseling = false;
-                txtSmsCode.Tag = false.ToString();
-                if (await webHandelers.isPageReady())
-                {
-                    timer = new System.Windows.Forms.Timer();
-                    timer.Interval = 1000; // Set interval to 1 second
-                    timer.Tick += Timer_Tick;
-                    elapsedTime = TimeSpan.Zero; // Initialize elapsed time
-                    timer.Start();
-                    mainThread = new Thread(async () => await start());
-                    
-                    mainThread.Start();
-                }
+                txtSmsCode.Tag = false.ToString();               
+                timer = new System.Windows.Forms.Timer();
+                timer.Interval = 1000; // Set interval to 1 second
+                timer.Tick += Timer_Tick;
+                elapsedTime = TimeSpan.Zero; // Initialize elapsed time
+                timer.Start();
+                mainThread = new Thread(async () => await start());
+                mainThread.Start();
+                
             }
             
         }
@@ -450,6 +456,11 @@ namespace visa.vfsglobal.com
                 btnNewUser.PerformClick();
                 updateComboBoxUsers();
             }
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            browser.LoadUrl("https://whatismyipaddress.com/");
         }
     }
 }
