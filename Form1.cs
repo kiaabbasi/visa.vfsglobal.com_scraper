@@ -85,8 +85,16 @@ namespace visa.vfsglobal.com
                 {
                     return;
                 }
-                
-                string code = await API.getOTPFromServer(txtPhoneNumber.Text);
+                string send = "";
+                if (string.IsNullOrEmpty(txtPhoneNumber.Text))
+                {
+                    send = txtUsername.Text;
+                }
+                else
+                {
+                    send = txtPhoneNumber.Text;
+                }
+                string code = await API.getOTPFromServer(send);
                 if (!string.IsNullOrEmpty(code) && txtSmsCode.Tag.ToString() == false.ToString())
                 {
                     txtSmsCode.Text = code;
