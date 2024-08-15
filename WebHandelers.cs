@@ -149,7 +149,7 @@ namespace visa.vfsglobal.com
                 return false;
 
             
-            JavascriptResponse response = await chromiumWebBrowser.EvaluateScriptAsync(script);
+            JavascriptResponse response = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(script);
 
             if (response.Success && response.Result is bool result)
             {
@@ -851,28 +851,7 @@ positionInDocument;
             await chromiumWebBrowser.WaitForInitialLoadAsync(); 
             
         }
-        public async Task WaitForPageNavigation()
-        {
-            var tcs = new TaskCompletionSource<bool>();
-
-            EventHandler<FrameLoadEndEventArgs> handler = null;
-            handler = (sender, e) =>
-            {
-                if (e.Frame.IsMain && e.Url != null && e.Url.StartsWith("https://ve.cbi.ir/"))
-                {
-                    chromiumWebBrowser.FrameLoadEnd -= handler;
-                    tcs.SetResult(true);
-                }
-            };
-
-            chromiumWebBrowser.FrameLoadEnd += handler;
-
-            // Submit the form or trigger the action that leads to navigation
-            // For example, click the submit button
-
-            // Wait for the new page to load
-            await tcs.Task;
-        }
+        
 
         public async Task<bool> isElementExist(string elementId)
         {
