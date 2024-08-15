@@ -1,4 +1,5 @@
 ﻿using CefSharp;
+using CefSharp.Internals;
 using CefSharp.WinForms;
 using System;
 using System.Collections.Generic;
@@ -163,40 +164,49 @@ namespace visa.vfsglobal.com
 
                 startLock = true;
                 Invoke(new Action(() => lblStatus.Text = "درحال اجرا"));
-                
 
 
+                int resultLoop = 0;
                 while (true)
                 {
-                    if (webHandelers.chromiumWebBrowser.Address != "https://visa.vfsglobal.com/irn/en/dnk/login")
+                    if (resultLoop != -3)
                     {
-                        await webHandelers.chromiumWebBrowser.LoadUrlAsync("https://visa.vfsglobal.com/irn/en/dnk/login");
-                    }
-                    await webHandelers.waitPageReady();
-                   
-                    if (webHandelers.isCanseling)
-                    {
-                        return;
-                    }
-                    await WebTask.page1(webHandelers, txtUsername.Text, txtPassword.Text);
-                    Invoke(new Action(() => lblStatus.Text = "در انتظار کد"));
-                    autoSmsFilerTask =fillSmsUseingApi();
-                    int resulrt =await forcSmsNotEmpty();
-                    if (resulrt == 0)
-                    {
-                        while (!await WebTask.page2(webHandelers, txtSmsCode.Text))
+
+                        if (webHandelers.chromiumWebBrowser.Address != "https://visa.vfsglobal.com/irn/en/dnk/login")
                         {
-                            Invoke(new Action(() => lblStatus.Text = "خطا در کلادفلر تلاش مجدد در 10 ثاتیه"));
-                            await customDeley(10);
+                            await webHandelers.chromiumWebBrowser.LoadUrlAsync("https://visa.vfsglobal.com/irn/en/dnk/login");
                         }
-                        
+                        await webHandelers.waitPageReady();
+
+                        if (webHandelers.isCanseling)
+                        {
+                            return;
+                        }
+                        await WebTask.page1(webHandelers, txtUsername.Text, txtPassword.Text);
+                        Invoke(new Action(() => lblStatus.Text = "در انتظار کد"));
+                        autoSmsFilerTask = fillSmsUseingApi();
+                        int resulrt = await forcSmsNotEmpty();
+
+                        if (resulrt == 0)
+                        {
+                            while (!await WebTask.page2(webHandelers, txtSmsCode.Text))
+                            {
+                                Invoke(new Action(() => lblStatus.Text = "خطا در کلادفلر تلاش مجدد در 10 ثاتیه"));
+                                await customDeley(10);
+                            }
+
+                        }
                     }
                     await Task.Delay(1000);
                     await WebTask.page3_4(webHandelers, GetComboBoxApplicationCentreTextSafe(), GetComboBoAppointmentCategoryTextSafe(), GetsiticoneComboBox3TextSafe());
-                    int resultLoop=await getResultAsLoop();
+                    resultLoop=await getResultAsLoop();
                     if (resultLoop == -1)
                     {
                         return;
+                    }
+                    if (resultLoop == -3)
+                    {
+
                     }
                 }
             
@@ -211,6 +221,13 @@ namespace visa.vfsglobal.com
             }
             catch(Exception e)
             {
+                if (e.Message.Contains("Sorry you have encountered an error"))
+                {
+                    btnRefresh.PerformClick();
+                    Cef.GetGlobalCookieManager().DeleteCookies("", "");
+                    
+                    MessageBox.Show("Please set the proxy and try again");
+                }
                 string a = browser.GetSourceAsync().Result;
                 Invoke(new Action(() => lblStatus.Text = e.Message));
                 erorGeneraterd = true;
@@ -306,19 +323,43 @@ namespace visa.vfsglobal.com
                 {
                     await webHandelers.SelectFromSelectBox("#mat-select-value-5", (string)comboBoxAppointmentCategory.Invoke(new Func<string>(() => comboBoxAppointmentCategory.Items[0].ToString())));
                 }
+                for (int i = 1; i < 4; i++)
+                {
 
+
+
+                    await Task.Delay((1000 * i) / 2);
+                    await webHandelers.waitPageReady();
+                    await Task.Delay((1000 * i) / 2);
+                    await webHandelers.SelectFromSelectBox("#mat-select-value-5", GetComboBoAppointmentCategoryTextSafe());
+                    
+                    await Task.Delay((1000 * i) / 2);
+                    await webHandelers.waitPageReady();
+                    await Task.Delay((1000 * i) / 2);
+                    await webHandelers.SelectFromSelectBox("#mat-select-value-3", GetsiticoneComboBox3TextSafe());
+
+                    await Task.Delay((1000 * i) / 2);
+                    await webHandelers.waitPageReady();
+                    await Task.Delay((1000 * i) / 2);
+                    string setedVal = await webHandelers.getTextContentById("mat-select-value-3");
+                    string mustBeval = GetsiticoneComboBox3TextSafe();
+                    if (setedVal == mustBeval)
+                    {
+                        break;
+                    }
+                    else if ( i >=3 && setedVal != mustBeval)
+                    {
+                        await webHandelers.clickByXpath("//*[@id=\"navbarDropdown\"]");
+                        await Task.Delay(1000);
+                        await webHandelers.clickByXpath("/html/body/app-root/div/header/div[1]/div/div/div/div/ul/li[1]/a");// dashbord butten
+                        await webHandelers.waitPageReady();
+                        return -3;//time to go dashbord
+                    }
+                }
                 
-                await Task.Delay(1000);
-                await webHandelers.waitPageReady();
-                await webHandelers.SelectFromSelectBox("#mat-select-value-5", GetComboBoAppointmentCategoryTextSafe());
-                await Task.Delay(1000);
-                await webHandelers.waitPageReady();
-                await webHandelers.SelectFromSelectBox("#mat-select-value-3", GetsiticoneComboBox3TextSafe());
-                await Task.Delay(1000);
-                await webHandelers.waitPageReady();
                 if (! await webHandelers.canIContnueRefreshing())
                 {
-                    return -2;
+                    return -2; // time to loging again
                 }
             }
         }
