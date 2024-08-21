@@ -52,21 +52,42 @@ namespace visa.vfsglobal.com
             return (bool)response.Result;
            
         }
-        public async Task<bool> SelectFromSelectBox(string querySelector,string text)
+        public async Task clickbyQury(string quey)
         {
-            var clickpnt =await getPointOfElemntStartFromTopLeft(querySelector);
-            int x = (int)clickpnt.Left + 30;
-            int y = (int)clickpnt.Top + 20;
-            if (isCanseling)
-            {
-                return false;
-            }
-            DrawCircle(x, y);
-            chromiumWebBrowser.GetBrowser().GetHost().SendMouseClickEvent(x, y, MouseButtonType.Left, false, 1, CefEventFlags.None);
-            await Task.Delay(100);  // Use Thread.Sleep to ensure it's caught by ThreadAbortException
-            chromiumWebBrowser.GetBrowser().GetHost().SendMouseClickEvent(x, y, MouseButtonType.Left, true, 1, CefEventFlags.None);
-            await Task.Delay(200);
+            string clickscript = $"document.querySelector('{quey}').click();";
+            JavascriptResponse response = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(clickscript);
+        }
+        public async Task<string> getContentCustomFromSelectBox(int selectbox)
+        {
+            string customQury = $@"
+            var g = document.getElementsByClassName('form-group')[{selectbox}];
+            var e = g.children[g.children.length - 1];
+            var matSelectElement = e.getElementsByTagName('mat-select')[0];
+            var contentText = matSelectElement.textContent;
+            contentText;";
 
+            JavascriptResponse response = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(customQury);
+
+            if (response.Success && response.Result != null)
+            {
+                return response.Result.ToString();
+            }
+            else
+            {
+                // Logging or handling the error can be done here
+                return null;
+            }
+        }
+
+        public async Task<bool> SelectFromSelectBox(int selectboxCount,string text)
+        {
+            string scriptTofind = @$"
+            var g= document.getElementsByClassName(""form-group"")[{selectboxCount}]
+            var e = g.children[g.children.length-1]
+            var matSelectElements = e.getElementsByTagName('mat-select')[0].click();";
+
+
+            JavascriptResponse response1 = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(scriptTofind);
             string scriptToClick = @$"function findAndClick() {{
             // Find all elements with the class 'mat-option-text'
             let elements = document.querySelectorAll('.mat-option-text');
@@ -173,7 +194,7 @@ namespace visa.vfsglobal.com
         }
         public async void DrawCircle(int x, int y)
         {
-            
+            return;
             string script = $@"
                 (function() {{
                     var canvas = document.createElement('canvas');
@@ -214,6 +235,27 @@ namespace visa.vfsglobal.com
 
             return response.Result.ToString();
         }
+        public async Task<string> getContentTextFromQurySelector(string qury)
+        {
+            string script = $@"
+            (function() {{
+                var element = document.querySelector('{qury}');
+                var textContent = element.textContent;
+                return textContent;
+                
+            }})()
+        ";
+
+            var response = await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(script);
+            if (response.Success)
+            {
+
+
+                return response.Result.ToString();
+            }
+            return null;
+        }
+    
 
         public async Task<bool> canIContnueRefreshing()
         {
@@ -386,7 +428,7 @@ if (element) {{
                 return;
             }
             // Execute the JavaScript on the main frame
-            await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(script);
+            var javascriptResponse=  await chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync(script);
 
         }
         public async Task cansel()

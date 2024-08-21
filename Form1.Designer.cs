@@ -70,7 +70,7 @@
             this.lblTimer = new System.Windows.Forms.Label();
             this.lblStatus = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.siticoneButton1 = new Siticone.UI.WinForms.SiticoneButton();
+            this.btnStop = new Siticone.UI.WinForms.SiticoneButton();
             this.btnStart = new Siticone.UI.WinForms.SiticoneButton();
             this.button1 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
@@ -89,7 +89,7 @@
             this.panelMain.Location = new System.Drawing.Point(0, 0);
             this.panelMain.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.panelMain.Name = "panelMain";
-            this.panelMain.Size = new System.Drawing.Size(1241, 971);
+            this.panelMain.Size = new System.Drawing.Size(1241, 951);
             this.panelMain.TabIndex = 0;
             // 
             // panelRight
@@ -139,7 +139,7 @@
             this.panelRight.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.panelRight.Name = "panelRight";
             this.panelRight.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.panelRight.Size = new System.Drawing.Size(388, 971);
+            this.panelRight.Size = new System.Drawing.Size(388, 951);
             this.panelRight.TabIndex = 6;
             // 
             // btnRefresh
@@ -448,7 +448,7 @@
             this.txtEndNumber.ShadowDecoration.Parent = this.txtEndNumber;
             this.txtEndNumber.Size = new System.Drawing.Size(77, 29);
             this.txtEndNumber.TabIndex = 10;
-            this.txtEndNumber.TextChanged += new System.EventHandler(this.txtEndNumber_TextChanged);
+      
             this.txtEndNumber.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtEndNumber_KeyDown);
             // 
             // txtStartNumber
@@ -475,7 +475,6 @@
             this.txtStartNumber.ShadowDecoration.Parent = this.txtStartNumber;
             this.txtStartNumber.Size = new System.Drawing.Size(78, 29);
             this.txtStartNumber.TabIndex = 9;
-            this.txtStartNumber.TextChanged += new System.EventHandler(this.txtStartNumber_TextChanged);
             this.txtStartNumber.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtEndNumber_KeyDown);
             // 
             // txtSmsCode
@@ -741,7 +740,7 @@
             this.panelRghitTop.Controls.Add(this.lblTimer);
             this.panelRghitTop.Controls.Add(this.lblStatus);
             this.panelRghitTop.Controls.Add(this.label3);
-            this.panelRghitTop.Controls.Add(this.siticoneButton1);
+            this.panelRghitTop.Controls.Add(this.btnStop);
             this.panelRghitTop.Controls.Add(this.btnStart);
             this.panelRghitTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelRghitTop.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -787,25 +786,25 @@
             this.label3.TabIndex = 6;
             this.label3.Text = "وضعیت :";
             // 
-            // siticoneButton1
+            // btnStop
             // 
-            this.siticoneButton1.CheckedState.Parent = this.siticoneButton1;
-            this.siticoneButton1.CustomImages.Parent = this.siticoneButton1;
-            this.siticoneButton1.FillColor = System.Drawing.Color.Transparent;
-            this.siticoneButton1.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.siticoneButton1.ForeColor = System.Drawing.Color.White;
-            this.siticoneButton1.HoveredState.Parent = this.siticoneButton1;
-            this.siticoneButton1.Image = global::visa.vfsglobal.com.Properties.Resources.rounded_black_square_shape_1_;
-            this.siticoneButton1.ImageAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.siticoneButton1.Location = new System.Drawing.Point(210, 13);
-            this.siticoneButton1.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
-            this.siticoneButton1.Name = "siticoneButton1";
-            this.siticoneButton1.ShadowDecoration.Parent = this.siticoneButton1;
-            this.siticoneButton1.Size = new System.Drawing.Size(85, 37);
-            this.siticoneButton1.TabIndex = 1;
-            this.siticoneButton1.Text = "توقف";
-            this.siticoneButton1.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
-            this.siticoneButton1.Click += new System.EventHandler(this.siticoneButton1_Click);
+            this.btnStop.CheckedState.Parent = this.btnStop;
+            this.btnStop.CustomImages.Parent = this.btnStop;
+            this.btnStop.FillColor = System.Drawing.Color.Transparent;
+            this.btnStop.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnStop.ForeColor = System.Drawing.Color.White;
+            this.btnStop.HoveredState.Parent = this.btnStop;
+            this.btnStop.Image = global::visa.vfsglobal.com.Properties.Resources.rounded_black_square_shape_1_;
+            this.btnStop.ImageAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.btnStop.Location = new System.Drawing.Point(210, 13);
+            this.btnStop.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.ShadowDecoration.Parent = this.btnStop;
+            this.btnStop.Size = new System.Drawing.Size(85, 37);
+            this.btnStop.TabIndex = 1;
+            this.btnStop.Text = "توقف";
+            this.btnStop.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
+            this.btnStop.Click += new System.EventHandler(this.siticoneButton1_Click);
             // 
             // btnStart
             // 
@@ -859,14 +858,14 @@
             this.panelBrowser.Location = new System.Drawing.Point(0, 0);
             this.panelBrowser.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.panelBrowser.Name = "panelBrowser";
-            this.panelBrowser.Size = new System.Drawing.Size(856, 971);
+            this.panelBrowser.Size = new System.Drawing.Size(856, 951);
             this.panelBrowser.TabIndex = 0;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1241, 971);
+            this.ClientSize = new System.Drawing.Size(1241, 951);
             this.Controls.Add(this.panelMain);
             this.Font = new System.Drawing.Font("IRANSansWeb", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
@@ -891,7 +890,7 @@
         private System.Windows.Forms.Panel panelRight;
         private System.Windows.Forms.Panel panelRghitTop;
         private Siticone.UI.WinForms.SiticoneButton btnStart;
-        private Siticone.UI.WinForms.SiticoneButton siticoneButton1;
+        private Siticone.UI.WinForms.SiticoneButton btnStop;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.Label label4;

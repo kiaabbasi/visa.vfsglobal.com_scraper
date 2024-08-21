@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace visa.vfsglobal.com
 {
@@ -66,6 +67,7 @@ namespace visa.vfsglobal.com
             Thread.Sleep(100);  // Use Thread.Sleep to ensure it's caught by ThreadAbortException
             webHandelers.chromiumWebBrowser.GetBrowser().GetHost().SendMouseClickEvent(x, y, MouseButtonType.Left, true, 1, CefEventFlags.None);
 
+            //await acseptCoocieIfExsist(webHandelers);
             bool cludFlareSusses = false;
             for (int i = 0; i < 5; i++)
             {
@@ -80,18 +82,24 @@ namespace visa.vfsglobal.com
                     break;
                 }
             }
-            if (!string.IsNullOrWhiteSpace(await webHandelers.getTextContentById("errorEmail")))
-            {
-                throw new Exception(await webHandelers.getTextContentById("errorEmail"));
-            }
-            else if (! string.IsNullOrWhiteSpace( await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div/span")))
-            {
-                throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div/span"));
-            }
-            
+           
+
             if (cludFlareSusses)
             {
                 await webHandelers.clickByXpath("/html/body/app-root/div/div/app-login/section/div/div/mat-card/form/button");
+                await webHandelers.waitPageReady();
+                if (!string.IsNullOrWhiteSpace(await webHandelers.getTextContentById("errorEmail")))
+                {
+                    throw new Exception(await webHandelers.getTextContentById("errorEmail"));
+                }
+                else if (!string.IsNullOrWhiteSpace(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div/span")))
+                {
+                    throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div/span"));
+                }
+                else if (!string.IsNullOrWhiteSpace(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div/div")))
+                {
+                    throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div/div"));
+                }
             }
             else
             {
@@ -141,31 +149,60 @@ namespace visa.vfsglobal.com
             }
             return false;
         }
-        public static async Task page3_4(WebHandelers webHandelers, string selectBox1, string selectBox2, string selectBox3)
+        public static async Task page4(WebHandelers webHandelers,string selectBox1, string selectBox2, string selectBox3)
         {
             if (webHandelers.isCanseling)
                 return;
-            
+            try
+            {
+                
+                await webHandelers.SelectFromSelectBox(0, selectBox1);
+                await Task.Delay(1000);
+                await webHandelers.waitPageReady();
+                await webHandelers.SelectFromSelectBox(1, selectBox2);
+                await Task.Delay(1000);
+                await webHandelers.waitPageReady();
+                await webHandelers.SelectFromSelectBox(2, selectBox3);
+                await Task.Delay(1000);
+                await webHandelers.waitPageReady();
+            }
+            catch (Exception e)
+            {
 
+                if (string.IsNullOrWhiteSpace(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div")))
+                {
+                    throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div"));
+                }
+                else if (string.IsNullOrWhiteSpace(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div")))
+                {
+                    throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div"));
+                }
+                else
+                {
+                    throw e;
+                }
+            }
+        }
+        public static async Task page3(WebHandelers webHandelers )
+        {
+            if (webHandelers.isCanseling)
+                return;
+
+            
             try
             {
                 await webHandelers.waitPageReady();
                 await Task.Delay(1000);
+                if (!string.IsNullOrEmpty(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div")))
+                {
+                    throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div"));
+                }
                 await webHandelers.clickByXpath("/html/body/app-root/div/div/app-dashboard/section[1]/div/div[2]/div/button/span[1]");
                 await webHandelers.waitPageReady();
                 await Task.Delay(1000);
                 //page4
-                if (webHandelers.isCanseling)
-                    return;
-                await webHandelers.SelectFromSelectBox("#mat-select-value-1", selectBox1);
-                await Task.Delay(1000);
-                await webHandelers.waitPageReady();
-                await webHandelers.SelectFromSelectBox("#mat-select-value-5", selectBox2);
-                await Task.Delay(1000);
-                await webHandelers.waitPageReady();
-                await webHandelers.SelectFromSelectBox("#mat-select-value-3", selectBox3);
-                await Task.Delay(1000);
-                await webHandelers.waitPageReady();
+                
+                
             }
             catch (Exception e)
             {
@@ -187,7 +224,12 @@ namespace visa.vfsglobal.com
             
 
         }
+        public static async Task acseptCoocieIfExsist(WebHandelers webHandelers)
+        {
+            await webHandelers.ClickElementById("onetrust-accept-btn-handler");
+        }
     }
+    
     public class CustomRequestHandler : RequestHandler
     {
         private string proxy;

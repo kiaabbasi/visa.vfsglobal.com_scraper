@@ -27,15 +27,17 @@ namespace visa.vfsglobal.com
 
         private void InitializeChromium()
         {
-            // Initialize CefSharp settings
+
             var settings = new CefSettings();
+            
+
             Cef.Initialize(settings);
 
             // Create the custom request handler with no initial proxy
             requestHandler = new CustomRequestHandler(null);
 
             // Create a new instance of ChromiumWebBrowser
-            browser = new ChromiumWebBrowser("https://whatismyipaddress.com/")//https://visa.vfsglobal.com/irn/en/dnk/login
+            browser = new ChromiumWebBrowser("https://whatismyipaddress.com/")//https://visa.vfsglobal.com/irn/en/dnk/login https://whatismyipaddress.com/
             {
                 Dock = DockStyle.Fill,
                 RequestHandler = requestHandler // Set the custom request handler
@@ -183,6 +185,7 @@ namespace visa.vfsglobal.com
                             return;
                         }
                         await WebTask.page1(webHandelers, txtUsername.Text, txtPassword.Text);
+                        
                         Invoke(new Action(() => lblStatus.Text = "در انتظار کد"));
                         autoSmsFilerTask = fillSmsUseingApi();
                         int resulrt = await forcSmsNotEmpty();
@@ -191,6 +194,10 @@ namespace visa.vfsglobal.com
                         {
                             while (!await WebTask.page2(webHandelers, txtSmsCode.Text))
                             {
+                                if (webHandelers.isCanseling)
+                                {
+                                    return;
+                                }
                                 Invoke(new Action(() => lblStatus.Text = "خطا در کلادفلر تلاش مجدد در 10 ثاتیه"));
                                 await customDeley(10);
                             }
@@ -198,7 +205,8 @@ namespace visa.vfsglobal.com
                         }
                     }
                     await Task.Delay(1000);
-                    await WebTask.page3_4(webHandelers, GetComboBoxApplicationCentreTextSafe(), GetComboBoAppointmentCategoryTextSafe(), GetsiticoneComboBox3TextSafe());
+                    await WebTask.page3(webHandelers);
+                    await WebTask.page4(webHandelers, GetComboBoxApplicationCentreTextSafe(), GetComboBoAppointmentCategoryTextSafe(), GetsiticoneComboBox3TextSafe());
                     resultLoop=await getResultAsLoop();
                     if (resultLoop == -1)
                     {
@@ -223,7 +231,8 @@ namespace visa.vfsglobal.com
             {
                 if (e.Message.Contains("Sorry you have encountered an error"))
                 {
-                    btnRefresh.PerformClick();
+                    Invoke(new Action(() => btnRefresh.PerformClick()));
+                    
                     Cef.GetGlobalCookieManager().DeleteCookies("", "");
                     
                     MessageBox.Show("Please set the proxy and try again");
@@ -252,12 +261,13 @@ namespace visa.vfsglobal.com
         
         private async void btnStart_Click(object sender, EventArgs e)
         {
-            
-            
-            if (! startLock)
+
+
+            if (!startLock)
             {
+                txtSmsCode.Clear();
                 webHandelers.isCanseling = false;
-                txtSmsCode.Tag = false.ToString();               
+                txtSmsCode.Tag = false.ToString();
                 timer = new System.Windows.Forms.Timer();
                 timer.Interval = 1000; // Set interval to 1 second
                 timer.Tick += Timer_Tick;
@@ -265,7 +275,11 @@ namespace visa.vfsglobal.com
                 timer.Start();
                 mainThread = new Thread(async () => await start());
                 mainThread.Start();
-                
+
+            }
+            else
+            {
+                btnStop.PerformClick();
             }
             
         }
@@ -312,42 +326,45 @@ namespace visa.vfsglobal.com
                 else
                     Invoke(new Action(() => lblStatus.Text = "خطا در ارسال اطلاعات"));
                 int deley = rnd.Next(Convert.ToInt32(txtStartNumber.Text), Convert.ToInt32(txtEndNumber.Text));
+                await Task.Delay(1000);
                 Invoke(new Action(() => lblStatus.Text = $"{deley} ثانیه"));
-                await customDeley(deley);
+                await customDeley(deley-1);
                 Invoke(new Action(() => lblStatus.Text = "رفرش صفحه"));
                 if ((bool)comboBoxAppointmentCategory.Invoke(new Func<bool>(() => comboBoxAppointmentCategory.SelectedIndex ==0 )))
                 {
-                    await webHandelers.SelectFromSelectBox("#mat-select-value-5", (string)comboBoxAppointmentCategory.Invoke(new Func<string>(() => comboBoxAppointmentCategory.Items[1].ToString())));
+                    await webHandelers.SelectFromSelectBox(1, (string)comboBoxAppointmentCategory.Invoke(new Func<string>(() => comboBoxAppointmentCategory.Items[1].ToString())));
                 }
                 else
                 {
-                    await webHandelers.SelectFromSelectBox("#mat-select-value-5", (string)comboBoxAppointmentCategory.Invoke(new Func<string>(() => comboBoxAppointmentCategory.Items[0].ToString())));
+                    await webHandelers.SelectFromSelectBox(1, (string)comboBoxAppointmentCategory.Invoke(new Func<string>(() => comboBoxAppointmentCategory.Items[0].ToString())));
                 }
                 for (int i = 1; i < 4; i++)
                 {
 
 
-
+                    if (webHandelers.isCanseling)
+                        return -1;
                     await Task.Delay((1000 * i) / 2);
                     await webHandelers.waitPageReady();
                     await Task.Delay((1000 * i) / 2);
-                    await webHandelers.SelectFromSelectBox("#mat-select-value-5", GetComboBoAppointmentCategoryTextSafe());
+                    await webHandelers.SelectFromSelectBox(1, GetComboBoAppointmentCategoryTextSafe());
                     
                     await Task.Delay((1000 * i) / 2);
                     await webHandelers.waitPageReady();
                     await Task.Delay((1000 * i) / 2);
-                    await webHandelers.SelectFromSelectBox("#mat-select-value-3", GetsiticoneComboBox3TextSafe());
+                    await webHandelers.SelectFromSelectBox(2, GetsiticoneComboBox3TextSafe());
 
                     await Task.Delay((1000 * i) / 2);
                     await webHandelers.waitPageReady();
                     await Task.Delay((1000 * i) / 2);
-                    string setedVal = await webHandelers.getTextContentById("mat-select-value-3");
+                    string setedVal = await webHandelers.getContentCustomFromSelectBox(2);
                     string mustBeval = GetsiticoneComboBox3TextSafe();
+                    
                     if (setedVal == mustBeval)
                     {
                         break;
                     }
-                    else if ( i >=3 && setedVal != mustBeval)
+                    if ( i >=3 && setedVal != mustBeval)
                     {
                         await webHandelers.clickByXpath("//*[@id=\"navbarDropdown\"]");
                         await Task.Delay(1000);
@@ -401,17 +418,7 @@ namespace visa.vfsglobal.com
             }
         }
 
-        private void txtEndNumber_TextChanged(object sender, EventArgs e)
-        {
-            if (String.IsNullOrEmpty(txtEndNumber.Text))
-            {
-                txtEndNumber.Text = "0";
-            }
-            if (Convert.ToInt32(txtEndNumber.Text) < Convert.ToInt32(txtStartNumber.Text))
-            {
-                txtEndNumber.Text = txtStartNumber.Text;
-            }
-        }
+        
 
         private void Form1_Load_1(object sender, EventArgs e)
         {
@@ -462,6 +469,7 @@ namespace visa.vfsglobal.com
             txtPassword.Clear();
             txtProxy.Clear();
             txtPhoneNumber.Clear();
+            txtSmsCode.Clear();
             comboBoxUsers.SelectedIndex = -1;
 
         }
