@@ -1,10 +1,13 @@
 ﻿using CefSharp;
+using CefSharp.Handler;
 using CefSharp.Internals;
 using CefSharp.WinForms;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,33 +20,36 @@ namespace visa.vfsglobal.com
     {
         private ChromiumWebBrowser browser;
         private WebHandelers webHandelers;
-        private CustomRequestHandler requestHandler;
+        private CustomRequestHandler customRequestHandler;
 
         public Form1()
         {
             InitializeComponent();
             InitializeChromium();
         }
-
-        private void InitializeChromium()
+        public CefSettings settings;
+        private void InitializeChromium(string proxy = "")
         {
+            string username = "tickets";
+            string password = "proxyon145";
+            settings = new CefSettings();
 
-            var settings = new CefSettings();
             
+            if (!string.IsNullOrEmpty(proxy))
+            {
+                settings.CefCommandLineArgs["proxy-server"] = $"http://{proxy}";
+            }
 
+           
             Cef.Initialize(settings);
 
-            // Create the custom request handler with no initial proxy
-            requestHandler = new CustomRequestHandler(null);
-
-            // Create a new instance of ChromiumWebBrowser
-            browser = new ChromiumWebBrowser("https://whatismyipaddress.com/")//https://visa.vfsglobal.com/irn/en/dnk/login https://whatismyipaddress.com/
+            customRequestHandler = new CustomRequestHandler(username, password);
+            browser = new ChromiumWebBrowser("https://api.ipify.org/?format=json")
             {
                 Dock = DockStyle.Fill,
-                RequestHandler = requestHandler // Set the custom request handler
+                RequestHandler = customRequestHandler
             };
 
-            // Add the browser to the panelMain
             panelBrowser.Controls.Add(browser);
             webHandelers = new WebHandelers(browser);
         }
@@ -55,10 +61,7 @@ namespace visa.vfsglobal.com
             browser.ShowDevTools();
         }
 
-        private void button4_Click(object sender, EventArgs e)
-        {
-            webHandelers.RemoveCircle();
-        }
+        
         private async Task<int> forcSmsNotEmpty()
         {
             while (txtSmsCode.Tag.ToString()==false.ToString()){
@@ -76,7 +79,10 @@ namespace visa.vfsglobal.com
                 }
                 await Task.Delay (1000);
             }
-            Invoke(new Action(() => lblStatus.Text = "کد دریافت شد"));
+            
+            Invoke(new Action(() => {
+                lblStatus.Text = "کد دریافت شد";
+            } ));
             return 0;
         }
         private async Task fillSmsUseingApi()
@@ -201,7 +207,11 @@ namespace visa.vfsglobal.com
                                 Invoke(new Action(() => lblStatus.Text = "خطا در کلادفلر تلاش مجدد در 10 ثاتیه"));
                                 await customDeley(10);
                             }
-
+                            Invoke(new Action(() => {
+                                
+                                txtSmsCode.Text = "";
+                                txtSmsCode.Tag = false.ToString();
+                            }));
                         }
                     }
                     await Task.Delay(1000);
@@ -315,6 +325,14 @@ namespace visa.vfsglobal.com
             Random rnd = new Random();
             while (true)
             {
+                if (!string.IsNullOrWhiteSpace(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div/span")))
+                {
+                    throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div/span"));
+                }
+                else if (!string.IsNullOrWhiteSpace(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div/div")))
+                {
+                    throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div/div"));
+                }
                 if (webHandelers.isCanseling)
                 {
                     return -1;
@@ -381,11 +399,7 @@ namespace visa.vfsglobal.com
             }
         }
 
-        private void txtProxy_TextChanged(object sender, EventArgs e)
-        {
-            string proxy = txtProxy.Text;
-            requestHandler.SetProxy(proxy);
-        }
+        
 
         private void txtEndNumber_KeyDown(object sender, KeyEventArgs e)
         {
@@ -517,7 +531,24 @@ namespace visa.vfsglobal.com
 
         private void btnRefresh_Click(object sender, EventArgs e)
         {
-            browser.LoadUrl("https://whatismyipaddress.com/");
+            browser.LoadUrl("https://api.ipify.org/?format=json");
         }
+
+        private void txtProxy_Leave(object sender, EventArgs e)
+        {
+            string proxy = txtProxy.Text;
+            IRequestContext requestContext = browser.GetBrowser().GetHost().RequestContext;
+
+            if (requestContext != null && customRequestHandler != null)
+            {
+                
+                Cef.UIThreadTaskFactory.StartNew(() =>
+                {
+                    customRequestHandler.SetProxy(requestContext, proxy);
+                });
+            }
+        }
+
+
     }
 }

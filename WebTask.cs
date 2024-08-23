@@ -16,14 +16,15 @@ namespace visa.vfsglobal.com
 
         public static async Task page1(WebHandelers webHandelers, string username, string password, bool sendRealKeys = true)
         {
-            
-            if (webHandelers.chromiumWebBrowser.Address!= "https://visa.vfsglobal.com/irn/en/dnk/login" || ! await webHandelers.isElementExist("email"))
+
+            if (webHandelers.chromiumWebBrowser.Address != "https://visa.vfsglobal.com/irn/en/dnk/login" || !await webHandelers.isElementExist("email"))
             {
                 await webHandelers.chromiumWebBrowser.LoadUrlAsync("https://visa.vfsglobal.com/irn/en/dnk/login");
             }
             await webHandelers.WaitForFrameLoad();
             await webHandelers.waitPageReady();
             await Task.Delay(1000);
+            await acseptCoocieIfExsist(webHandelers);
             if (sendRealKeys)
             {
 
@@ -67,7 +68,6 @@ namespace visa.vfsglobal.com
             Thread.Sleep(100);  // Use Thread.Sleep to ensure it's caught by ThreadAbortException
             webHandelers.chromiumWebBrowser.GetBrowser().GetHost().SendMouseClickEvent(x, y, MouseButtonType.Left, true, 1, CefEventFlags.None);
 
-            //await acseptCoocieIfExsist(webHandelers);
             bool cludFlareSusses = false;
             for (int i = 0; i < 5; i++)
             {
@@ -82,7 +82,7 @@ namespace visa.vfsglobal.com
                     break;
                 }
             }
-           
+
 
             if (cludFlareSusses)
             {
@@ -104,7 +104,7 @@ namespace visa.vfsglobal.com
             else
             {
                 throw new Exception("cloudflare detected us");
-            } 
+            }
         }
 
         public static async Task<bool> page2(WebHandelers webHandelers, string smsCode)
@@ -121,7 +121,7 @@ namespace visa.vfsglobal.com
                 await Task.Delay(1000);
             }
 
-            await webHandelers.sendKeysByXpath("//*[@id=\"mat-input-5\"]", smsCode,true,60,10);
+            await webHandelers.sendKeysByXpath("//*[@id=\"mat-input-5\"]", smsCode, true, 60, 10);
             var result = await webHandelers.getPointOfElemntStartFromTopLeft("body > app-root > div > div > app-login > section > div > div > mat-card > form > app-cloudflare-captcha-container");
             //MessageBox.Show($"{result.Top},{result.Left}");
             int x = (int)result.Left + 30;
@@ -149,13 +149,13 @@ namespace visa.vfsglobal.com
             }
             return false;
         }
-        public static async Task page4(WebHandelers webHandelers,string selectBox1, string selectBox2, string selectBox3)
+        public static async Task page4(WebHandelers webHandelers, string selectBox1, string selectBox2, string selectBox3)
         {
             if (webHandelers.isCanseling)
                 return;
             try
             {
-                
+
                 await webHandelers.SelectFromSelectBox(0, selectBox1);
                 await Task.Delay(1000);
                 await webHandelers.waitPageReady();
@@ -183,16 +183,20 @@ namespace visa.vfsglobal.com
                 }
             }
         }
-        public static async Task page3(WebHandelers webHandelers )
+        public static async Task page3(WebHandelers webHandelers)
         {
             if (webHandelers.isCanseling)
                 return;
 
-            
             try
             {
                 await webHandelers.waitPageReady();
                 await Task.Delay(1000);
+                if (webHandelers.chromiumWebBrowser.Address == "https://visa.vfsglobal.com/irn/en/dnk/login")
+                {
+                    webHandelers.chromiumWebBrowser.Reload();
+                    throw new Exception("page 2 fail");
+                }
                 if (!string.IsNullOrEmpty(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div")))
                 {
                     throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div"));
@@ -201,8 +205,8 @@ namespace visa.vfsglobal.com
                 await webHandelers.waitPageReady();
                 await Task.Delay(1000);
                 //page4
-                
-                
+
+
             }
             catch (Exception e)
             {
@@ -220,8 +224,8 @@ namespace visa.vfsglobal.com
                     throw e;
                 }
             }
-            
-            
+
+
 
         }
         public static async Task acseptCoocieIfExsist(WebHandelers webHandelers)
@@ -229,50 +233,5 @@ namespace visa.vfsglobal.com
             await webHandelers.ClickElementById("onetrust-accept-btn-handler");
         }
     }
-    
-    public class CustomRequestHandler : RequestHandler
-    {
-        private string proxy;
 
-        public CustomRequestHandler(string initialProxy)
-        {
-            proxy = initialProxy;
-        }
-
-        public void SetProxy(string newProxy)
-        {
-            proxy = newProxy;
-            UpdateProxySettings();
-        }
-
-        private void UpdateProxySettings()
-        {
-            Cef.UIThreadTaskFactory.StartNew(() =>
-            {
-                var browser = Cef.GetGlobalRequestContext();
-                if (!string.IsNullOrEmpty(proxy))
-                {
-                    var proxyDict = new Dictionary<string, object>
-                {
-                    { "mode", "fixed_servers" },
-                    { "server", proxy }
-                };
-                    browser.SetPreference("proxy", proxyDict, out string error);
-                }
-                else
-                {
-                    var proxyDict = new Dictionary<string, object>
-                {
-                    { "mode", "direct" }
-                };
-                    browser.SetPreference("proxy", proxyDict, out string error);
-                }
-            });
-        }
-
-        protected override IResourceRequestHandler GetResourceRequestHandler(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, IRequest request, bool isNavigation, bool isDownload, string requestInitiator, ref bool disableDefaultHandling)
-        {
-            return base.GetResourceRequestHandler(chromiumWebBrowser, browser, frame, request, isNavigation, isDownload, requestInitiator, ref disableDefaultHandling);
-        }
-    }
 }

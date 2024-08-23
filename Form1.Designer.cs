@@ -133,6 +133,7 @@
             this.panelRight.Controls.Add(this.panelRghitTop);
             this.panelRight.Controls.Add(this.button1);
             this.panelRight.Controls.Add(this.button3);
+            this.panelRight.Cursor = System.Windows.Forms.Cursors.Default;
             this.panelRight.Dock = System.Windows.Forms.DockStyle.Right;
             this.panelRight.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panelRight.Location = new System.Drawing.Point(853, 0);
@@ -145,6 +146,7 @@
             // btnRefresh
             // 
             this.btnRefresh.CheckedState.Parent = this.btnRefresh;
+            this.btnRefresh.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnRefresh.CustomImages.Parent = this.btnRefresh;
             this.btnRefresh.FillColor = System.Drawing.Color.Transparent;
             this.btnRefresh.FillColor2 = System.Drawing.Color.Transparent;
@@ -356,6 +358,7 @@
             // 
             this.btnNewUser.BorderRadius = 7;
             this.btnNewUser.CheckedState.Parent = this.btnNewUser;
+            this.btnNewUser.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnNewUser.CustomImages.Parent = this.btnNewUser;
             this.btnNewUser.FillColor = System.Drawing.Color.Gray;
             this.btnNewUser.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -374,6 +377,7 @@
             // 
             this.removeUser.BorderRadius = 7;
             this.removeUser.CheckedState.Parent = this.removeUser;
+            this.removeUser.Cursor = System.Windows.Forms.Cursors.Hand;
             this.removeUser.CustomImages.Parent = this.removeUser;
             this.removeUser.FillColor = System.Drawing.Color.Gray;
             this.removeUser.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -392,6 +396,7 @@
             // 
             this.SaveUser.BorderRadius = 7;
             this.SaveUser.CheckedState.Parent = this.SaveUser;
+            this.SaveUser.Cursor = System.Windows.Forms.Cursors.Hand;
             this.SaveUser.CustomImages.Parent = this.SaveUser;
             this.SaveUser.FillColor = System.Drawing.Color.Gray;
             this.SaveUser.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -410,6 +415,7 @@
             // 
             this.btnSubmitSms.BorderRadius = 7;
             this.btnSubmitSms.CheckedState.Parent = this.btnSubmitSms;
+            this.btnSubmitSms.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnSubmitSms.CustomImages.Parent = this.btnSubmitSms;
             this.btnSubmitSms.FillColor = System.Drawing.Color.Gray;
             this.btnSubmitSms.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -448,7 +454,6 @@
             this.txtEndNumber.ShadowDecoration.Parent = this.txtEndNumber;
             this.txtEndNumber.Size = new System.Drawing.Size(77, 29);
             this.txtEndNumber.TabIndex = 10;
-      
             this.txtEndNumber.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtEndNumber_KeyDown);
             // 
             // txtStartNumber
@@ -582,7 +587,7 @@
             this.txtPhoneNumber.ShadowDecoration.Parent = this.txtPhoneNumber;
             this.txtPhoneNumber.Size = new System.Drawing.Size(175, 29);
             this.txtPhoneNumber.TabIndex = 3;
-            this.txtPhoneNumber.TextChanged += new System.EventHandler(this.txtProxy_TextChanged);
+            
             // 
             // txtProxy
             // 
@@ -608,7 +613,8 @@
             this.txtProxy.ShadowDecoration.Parent = this.txtProxy;
             this.txtProxy.Size = new System.Drawing.Size(175, 29);
             this.txtProxy.TabIndex = 2;
-            this.txtProxy.TextChanged += new System.EventHandler(this.txtProxy_TextChanged);
+            
+            this.txtProxy.Leave += new System.EventHandler(this.txtProxy_Leave);
             // 
             // txtPassword
             // 
@@ -789,6 +795,7 @@
             // btnStop
             // 
             this.btnStop.CheckedState.Parent = this.btnStop;
+            this.btnStop.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnStop.CustomImages.Parent = this.btnStop;
             this.btnStop.FillColor = System.Drawing.Color.Transparent;
             this.btnStop.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -809,6 +816,7 @@
             // btnStart
             // 
             this.btnStart.CheckedState.Parent = this.btnStart;
+            this.btnStart.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnStart.CustomImages.Parent = this.btnStart;
             this.btnStart.FillColor = System.Drawing.Color.Transparent;
             this.btnStart.Font = new System.Drawing.Font("IRANSansWeb", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -867,6 +875,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1241, 951);
             this.Controls.Add(this.panelMain);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Font = new System.Drawing.Font("IRANSansWeb", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.Name = "Form1";
