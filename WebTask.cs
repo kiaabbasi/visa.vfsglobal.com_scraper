@@ -2,6 +2,7 @@
 using CefSharp.Handler;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -13,7 +14,31 @@ namespace visa.vfsglobal.com
 {
     internal class WebTask
     {
+        public static async Task rasieForErrors(WebHandelers webHandelers)
+        {
+            for (int i = 0; i < 10; i++)
+            {
 
+
+                if (!string.IsNullOrWhiteSpace(await webHandelers.getTextContentById("errorEmail")))
+                {
+                    throw new Exception(await webHandelers.getTextContentById("errorEmail"));
+                }
+                else if (!string.IsNullOrWhiteSpace(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div/span")))
+                {
+                    throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/header/app-notification/div/span"));
+                }
+                else if (!string.IsNullOrWhiteSpace(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div/div")))
+                {
+                    throw new Exception(await webHandelers.getContentTextFromXPATH("/html/body/app-root/div/div/app-login/section/div/div/mat-card/div/div/div"));
+                }
+                else if (webHandelers.isCanseling)
+                {
+                    return;
+                }
+                await Task.Delay(5000);
+            }
+        }
         public static async Task page1(WebHandelers webHandelers, string username, string password, bool sendRealKeys = true)
         {
 
@@ -25,6 +50,7 @@ namespace visa.vfsglobal.com
             await webHandelers.waitPageReady();
             await Task.Delay(1000);
             await acseptCoocieIfExsist(webHandelers);
+            rasieForErrors(webHandelers);
             if (sendRealKeys)
             {
 
@@ -110,8 +136,8 @@ namespace visa.vfsglobal.com
         public static async Task<bool> page2(WebHandelers webHandelers, string smsCode)
         {
 
-
             await webHandelers.WaitForFrameLoad();
+            await acseptCoocieIfExsist(webHandelers);
             while (!await webHandelers.isPageReady())
             {
                 if (webHandelers.isCanseling)
@@ -151,11 +177,12 @@ namespace visa.vfsglobal.com
         }
         public static async Task page4(WebHandelers webHandelers, string selectBox1, string selectBox2, string selectBox3)
         {
+            await webHandelers.waitPageReady();
             if (webHandelers.isCanseling)
                 return;
             try
             {
-
+                await acseptCoocieIfExsist(webHandelers);
                 await webHandelers.SelectFromSelectBox(0, selectBox1);
                 await Task.Delay(1000);
                 await webHandelers.waitPageReady();
@@ -192,6 +219,7 @@ namespace visa.vfsglobal.com
             {
                 await webHandelers.waitPageReady();
                 await Task.Delay(1000);
+                await acseptCoocieIfExsist(webHandelers);
                 if (webHandelers.chromiumWebBrowser.Address == "https://visa.vfsglobal.com/irn/en/dnk/login")
                 {
                     webHandelers.chromiumWebBrowser.Reload();
@@ -231,6 +259,42 @@ namespace visa.vfsglobal.com
         public static async Task acseptCoocieIfExsist(WebHandelers webHandelers)
         {
             await webHandelers.ClickElementById("onetrust-accept-btn-handler");
+        }
+
+
+
+
+
+        public static async Task resetModem(WebHandelers webHandelers, string loginpage, string password)
+        {
+            webHandelers.isCanseling = false;
+            await webHandelers.chromiumWebBrowser.LoadUrlAsync(loginpage);
+            await webHandelers.simpleSetValue("login_password", password);
+            await webHandelers.ClickElementById("login_btn");
+            await webHandelers.WaitForFrameLoad();
+            await Task.Delay(3000);
+            await webHandelers.clickbyQury("#header_right > table > tbody > tr > td:nth-child(4) > div");
+            await Task.Delay(3000);
+            await webHandelers.chromiumWebBrowser.GetMainFrame().EvaluateScriptAsync("EMUI.RebootController.rebootExe()");
+            await API.waitOnline(webHandelers);
+        }
+        public static async Task RestartApplication(int user_index)
+        {
+            // Get the path to the current executable
+            string exePath = Application.ExecutablePath;
+
+            // Prepare the cmd command to wait for 2 seconds and then restart the app
+            string cmdArgs = $"/C timeout /T 2 & \"{exePath}\" {user_index}";
+
+            // Start cmd process with the timeout and restart logic
+            Process.Start(new ProcessStartInfo("cmd.exe", cmdArgs)
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false
+            });
+
+            // Close the current instance of the application
+            Application.Exit();
         }
     }
 

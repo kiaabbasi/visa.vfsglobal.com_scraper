@@ -856,7 +856,11 @@ positionInDocument;
             return response.Success && response.Result.ToString() != "-1";
         }
 
-
+        public async Task simpleSetValue(string id,string value)
+        {
+            string clearScript = $"document.getElementById('{id}').value = '{value}';";
+            var a = await chromiumWebBrowser.EvaluateScriptAsync(clearScript);
+        }
         public async Task sendKeyToId(string id, string value,bool runEvent=true)
         {
             
